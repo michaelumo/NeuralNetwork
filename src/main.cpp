@@ -1,17 +1,20 @@
 #include <iostream>
 #include <cmath>
 #include "matrix.hpp"
+#include "parceptron.hpp"
+
+double sigmoid(double);
 
 int main(void){
-  Matrix B(3,3,1);
-  Matrix G(1,1,10);
-  Matrix D(3,3,3);
-  Matrix C(3,3,5);
-  C = B^D*2;
-  for(int i = 0; i < C.row; i++){
+  Parceptron p(2,2,1);
+  double in[2][1] = {{1},{0}};
+  double target[1][1] = {{1}};
+  p.feedforward((double *) in);
+  p.train((double *)target);
+  for(int i = 0; i < p.Outputs.row; i++){
     std::cout<<"| ";
-    for(int j = 0; j < C.col; j++){
-      std::cout << C.data[i][j] <<" ";
+    for(int j = 0; j < p.Outputs.col; j++){
+      std::cout << p.Outputs.data[i][j] <<" ";
     }
     std::cout<<"|"<<std::endl;
   }

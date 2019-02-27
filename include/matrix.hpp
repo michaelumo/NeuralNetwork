@@ -4,15 +4,18 @@
 class Matrix {
 public:
   int row, col;
-  int** data;
+  double** data;
+  Matrix();
   Matrix(int, int, double);
   Matrix(int, int);
   Matrix(int, int, double *);
   Matrix operator+(const Matrix &other);
   Matrix operator-(const Matrix &other);
-  Matrix operator^(const Matrix &other);
+  Matrix operator*(const Matrix &other);
   Matrix operator*(double);
   Matrix transpose();
+  Matrix map();
+  double sigmoid(double);
   /*void subtract_matrix(int *, int *, int, int, int);//send a ,b, row of a, column of a
   void multiply_matrix(int *, int *, int, int, int*);//send a, column of a, b, column of b
   void transpose(int *, int *, int, int);
