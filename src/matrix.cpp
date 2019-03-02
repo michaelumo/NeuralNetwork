@@ -77,6 +77,14 @@ Matrix Matrix::operator-(const Matrix &other){ //WORKING
   return Matrix(row, col, (double *)d);
 }
 
+Matrix Matrix::operator^(const int x){ //WORKING
+  Matrix d(row, col, (double *)data);
+  for(int k= 0; k < x; k++){
+    d = d*d;
+  }
+  return Matrix(row, col, (double *)d.data);
+}
+
 Matrix Matrix::operator*(const Matrix &other){ //WORKING
   if(other.row != col){
     std::cout<<" "<<"INCORRECT INDEX * "<<std::endl;
@@ -105,11 +113,45 @@ Matrix Matrix::operator*(double x){ //WORKING
   return Matrix(row, col, (double *)d);
 }
 
+Matrix Matrix::operator/(double x){ //WORKING
+  double d[row][col];
+  for (int i = 0; i < row; i++){
+    for(int j = 0; j < col; j++){
+      d[i][j] = data[i][j]/x;
+    }
+  }
+  return Matrix(row, col, (double *)d);
+}
+
 Matrix Matrix::map(){
   double d[row][col];
   for (int i = 0; i < row; i++){
     for(int j = 0; j < col; j++){
       d[i][j] = sigmoid(data[i][j]);
+    }
+  }
+  return Matrix(row, col, (double *)d);
+}
+
+Matrix Matrix::dsigmoid(){
+  double d[row][col];
+  for (int i = 0; i < row; i++){
+    for(int j = 0; j < col; j++){
+      d[i][j] = data[i][j]*(1.0-data[i][j]);
+    }
+  }
+  return Matrix(row, col, (double *)d);
+}
+
+Matrix Matrix::merge(const Matrix &other){
+  if(row != other.row || col != other.col){
+    std::cout<<"INDEX ERROR merge"<<std::endl;
+    return Matrix(row, col, 1);
+  }
+  double d[row][col];
+  for (int i = 0; i < row; i++){
+    for(int j = 0; j < col; j++){
+      d[i][j] = data[i][j]*other.data[i][j];
     }
   }
   return Matrix(row, col, (double *)d);

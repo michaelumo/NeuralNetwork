@@ -13,8 +13,12 @@ public:
   Matrix operator-(const Matrix &other);
   Matrix operator*(const Matrix &other);
   Matrix operator*(double);
+  Matrix operator/(double);
+  Matrix operator^(int);
   Matrix transpose();
   Matrix map();
+  Matrix dsigmoid();
+  Matrix merge(const Matrix &other);
   double sigmoid(double);
   /*void subtract_matrix(int *, int *, int, int, int);//send a ,b, row of a, column of a
   void multiply_matrix(int *, int *, int, int, int*);//send a, column of a, b, column of b
