@@ -1,8 +1,8 @@
-build/main.o: src/main.cpp include/matrix.hpp include/parceptron.hpp \
- include/matrix.hpp
+build/main.o: src/main.cpp /home/michael/include/matrix.h \
+ include/parceptron.h include/MT.h
 
-include/matrix.hpp:
+/home/michael/include/matrix.h:
 
-include/parceptron.hpp:
+include/parceptron.h:
 
-include/matrix.hpp:
+include/MT.h:
