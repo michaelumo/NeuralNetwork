@@ -6,8 +6,8 @@
 #include <ctime>
 #include <cstdlib>
 #include "matrix.h"
+#include "MT.h"
 #include "parceptron.h"
-//#include "MT.h"
 
 //double sigmoid(double);
 
@@ -59,7 +59,7 @@ int main(void){
   in(0,1) = 1;
   p.feedforward(in);
   //in.show_gorgeous();
-  
+
   p.Outputs.show_gorgeous();
 
   return 0;

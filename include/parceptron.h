@@ -1,13 +1,13 @@
 #ifndef PARCEPTRON_
   #define PARCEPTRON_
 
-  #include <iostream>
-  #include <cmath>
-  #include <ctime>
-  #include <vector>
-  #include <iomanip>
-  #include "MT.h"
-  #include "matrix.h"
+  // #include <iostream>
+  // #include <cmath>
+  // #include <ctime>
+  // #include <vector>
+  // #include <iomanip>
+//  #include "MT.h"
+//  #include "matrix.h"
 
 
 class Parceptron {
@@ -18,6 +18,9 @@ private:
     Matrix Fire;
   };
   std::vector<neurons> layer;
+  Matrix map(const Matrix &a);
+  Matrix dsigmoid(const Matrix &a);
+  Matrix merge(const Matrix &a, const Matrix &b);
 public:
   Matrix Inputs;
   Matrix Outputs;
@@ -27,7 +30,7 @@ public:
   ~Parceptron();
   void feedforward(Matrix &in);
   void train(Matrix &target);
-  double sigmoid(double);
+  double sigmoid(double x);
 };
 
 Parceptron::Parceptron(std::vector<int> v){
@@ -43,7 +46,11 @@ Parceptron::Parceptron(std::vector<int> v){
         n.Weight(j,k) = (genrand_int32()%2001-1000.0)/1000.0;
       }
     }
-    n.Bias = Matrix(1,v[i],1.0);
+    n.Bias = Matrix(v[i]);
+    for(int j = 0; j < v[i]; j++){
+      n.Bias(j) = 1.0;
+    }
+    n.Bias = n.Bias.t();
     layer.push_back(n);
   }
 
@@ -62,7 +69,7 @@ void Parceptron::train(Matrix &target){
   Errors = target-Outputs;
   HiddenErrors = Errors*layer[layer.size()-1].Weight.t();
 
-  Matrix grad = Outputs.dsigmoid();
+  Matrix grad = dsigmoid(Outputs);
   grad = Errors*grad;
   grad = grad*rate;
   delta_Weight = layer[layer.size()-2].Fire.t()*grad;
@@ -72,8 +79,8 @@ void Parceptron::train(Matrix &target){
   //--
 
   for(int i = layer.size()-2; i > 0; i--){
-    Matrix hidgrad = layer[i].Fire.dsigmoid();
-    hidgrad = HiddenErrors.merge(hidgrad);
+    Matrix hidgrad = dsigmoid(layer[i].Fire);
+    hidgrad = merge(HiddenErrors, hidgrad);
     HiddenErrors = HiddenErrors*layer[i].Weight.t();
     hidgrad = hidgrad*rate;
     delta_Weight = layer[i-1].Fire.t()*hidgrad;
@@ -86,9 +93,47 @@ void Parceptron::train(Matrix &target){
 void Parceptron::feedforward(Matrix &in){
   layer[0].Fire = in;
   for(int i = 1; i < layer.size(); i++){
-    layer[i].Fire = (layer[i-1].Fire*layer[i].Weight+layer[i].Bias).map();
+    layer[i].Fire = map(layer[i-1].Fire*layer[i].Weight+layer[i].Bias);
   }
   Outputs = layer[layer.size()-1].Fire;
+}
+
+Matrix Parceptron::map(const Matrix &a){
+  Matrix d(a.getRows(), a.getCols());
+  for (int i = 0; i < a.getRows(); i++){
+    for(int j = 0; j < a.getCols(); j++){
+      d(i,j) = sigmoid(a(i,j));
+    }
+  }
+  return d;
+}
+
+Matrix Parceptron::dsigmoid(const Matrix &a){
+  Matrix d(a.getRows(),a.getCols());
+  for (int i = 0; i < a.getRows(); i++){
+    for(int j = 0; j < a.getCols(); j++){
+      d(i,j) = a(i,j)*(1.0-a(i,j));
+    }
+  }
+  return d;
+}
+
+Matrix Parceptron::merge(const Matrix &a, const Matrix &b){
+  if(a.getRows() != b.getRows() || a.getCols() != b.getCols()){
+    std::cout<<"INDEX ERROR merge"<<std::endl;
+    exit(1);
+  }
+  Matrix d(a.getRows(), a.getCols());
+  for (int i = 0; i < a.getRows(); i++){
+    for(int j = 0; j < a.getCols(); j++){
+      d(i,j) = a(i,j)*b(i,j);
+    }
+  }
+  return d;
+}
+
+double Parceptron::sigmoid(double x){
+  return 1.0/(1.0+std::exp(-x));
 }
 
 #endif
