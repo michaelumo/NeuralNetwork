@@ -26,15 +26,16 @@ public:
   Matrix Outputs;
   int inputSize, outputSize, hiddenSize;
   double rate = 0.01;
-  Parceptron(std::vector<int> v);
+  Parceptron(std::vector<int> v, double r);
   ~Parceptron();
   void feedforward(Matrix &in);
   void train(Matrix &target);
   double sigmoid(double x);
 };
 
-Parceptron::Parceptron(std::vector<int> v){
+Parceptron::Parceptron(std::vector<int> v, double r){
   neurons tmp;
+  rate = r;
   layer.push_back(tmp);
   std::srand(std::time(NULL));//TODO: not truely random
   init_genrand(std::rand());
@@ -67,21 +68,17 @@ void Parceptron::train(Matrix &target){
   Matrix delta_Weight;
   //--Output Neuron
   Errors = target-Outputs;
-  HiddenErrors = Errors*layer[layer.size()-1].Weight.t();
-
-  Matrix grad = dsigmoid(Outputs);
-  grad = Errors*grad;
-  grad = grad*rate;
-  delta_Weight = layer[layer.size()-2].Fire.t()*grad;
+  HiddenErrors = Errors;
+  delta_Weight = layer[layer.size()-2].Fire.t()*(Errors*rate);
   layer[layer.size()-1].Weight = layer[layer.size()-1].Weight+delta_Weight;
   //std::cout<<"helloooo"<<std::endl;
-  layer[layer.size()-1].Bias = layer[layer.size()-1].Bias+grad;
+  layer[layer.size()-1].Bias = layer[layer.size()-1].Bias+(Errors*rate);
   //--
 
   for(int i = layer.size()-2; i > 0; i--){
+    HiddenErrors = HiddenErrors*layer[i+1].Weight.t();
     Matrix hidgrad = dsigmoid(layer[i].Fire);
     hidgrad = merge(HiddenErrors, hidgrad);
-    HiddenErrors = HiddenErrors*layer[i].Weight.t();
     hidgrad = hidgrad*rate;
     delta_Weight = layer[i-1].Fire.t()*hidgrad;
     layer[i].Weight = layer[i].Weight+delta_Weight;
@@ -93,7 +90,8 @@ void Parceptron::train(Matrix &target){
 void Parceptron::feedforward(Matrix &in){
   layer[0].Fire = in;
   for(int i = 1; i < layer.size(); i++){
-    layer[i].Fire = map(layer[i-1].Fire*layer[i].Weight+layer[i].Bias);
+    if(i == layer.size()-1)layer[i].Fire = layer[i-1].Fire*layer[i].Weight+layer[i].Bias;
+    else layer[i].Fire = map(layer[i-1].Fire*layer[i].Weight+layer[i].Bias);
   }
   Outputs = layer[layer.size()-1].Fire;
 }

@@ -9,57 +9,52 @@
 #include "MT.h"
 #include "parceptron.h"
 
-//double sigmoid(double);
 
 int main(void){
-  int nm = 10;
+  int nm = 3;
+  int epochs = 1000;
+  Matrix tmp(1,2);
   std::vector<int> layers;
   layers.push_back(2);
   layers.push_back(nm);
-  layers.push_back(nm);
-  //layers.push_back(nm);
   layers.push_back(1);
-  Parceptron p(layers);
-  Matrix in(1,2);
+
+  Parceptron p(layers, 0.2);
+  Matrix in(4,3);
+  in<<0,0,0,
+      0,2,2,
+      2,0,2,
+      2,2,0;
   Matrix target(1,1);
   std::srand(std::time(NULL));
-  for(int i = 0; i< 100000; i++){
-    in(0,0) = std::rand()%2;
-    //std::cout<<in[0][0]<<std::endl;
-    in(0,1) = std::rand()%2;
-    //in.show_gorgeous();
-    //std::cout<<in[0][1]<<std::endl;
-    p.feedforward(in);
-    //std::cout<<"helloooo"<<std::endl;
-    if(in(0,0) == in(0,1))target(0,0) = 0;
-    else target(0,0) = 1;
-    p.train(target);
+  for(int i = 0; i< epochs; i++){
+    for(int k = 0; k < in.getRows(); k++){
+      tmp<<in(k,0),in(k,1);
+      p.feedforward(tmp);
+      target<<in(k,2);
+      p.train(target);
+    }
   }
 
-  in(0,0) = 0;
-  in(0,1) = 0;
-  p.feedforward(in);
+  tmp<<0,0;
+  p.feedforward(tmp);
   //in.show_gorgeous();
   p.Outputs.show_gorgeous();
 
 
-  in(0,0) = 0;
-  in(0,1) = 1;
-  p.feedforward(in);
+  tmp<<0,2;
+  p.feedforward(tmp);
   //in.show_gorgeous();
   p.Outputs.show_gorgeous();
 
 
-  in(0,0) = 1;
-  in(0,1) = 0;
+  tmp<<2,0;
+  p.feedforward(tmp);
   p.Outputs.show_gorgeous();
 
 
-  in(0,0) = 1;
-  in(0,1) = 1;
-  p.feedforward(in);
-  //in.show_gorgeous();
-
+  tmp<<2,2;
+  p.feedforward(tmp);
   p.Outputs.show_gorgeous();
 
   return 0;
